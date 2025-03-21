@@ -20,11 +20,34 @@ public class SessionService : ISessionService
 
     public async Task<Session> GetSessionAsync()
     {
-        throw new NotImplementedException();
+        try
+        {
+            var earleRecord = await _dbContext.Sessions.OrderBy(s=>s.EndedAtUTC).FirstOrDefaultAsync();
+            if (earleRecord == null) 
+            {
+                throw new InvalidOperationException("No record found in data base");
+            }
+            return earleRecord;
+        }
+        catch (Exception ex) 
+        {
+            throw ex;    
+        }
+        //throw new NotImplementedException();
     }
 
     public async Task<List<Session>> GetSessionsAsync()
     {
+        try
+        {
+            var ActiveServices = await _dbContext.Sessions
+                .Where(x=>x.User.Status==Enums.UserStatus.Active && x.EndedAtUTC<new DateTime(2025,1,1)).ToListAsync();
+            return ActiveServices;
+        }
+        catch (Exception ex)
+        {
+            throw ex;
+        }
         throw new NotImplementedException();
     }
 }
